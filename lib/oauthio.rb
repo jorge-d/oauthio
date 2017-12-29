@@ -5,6 +5,7 @@ require 'json'
 
 # load project files
 require "oauthio/version"
+require "oauthio/client"
 
 module Oauthio
   @public_key = nil
@@ -35,7 +36,7 @@ module Oauthio
   def self.auth_url provider, redirect_url, csrf_token
     puts "[oauthio] Redirect to #{@oauthd_url}#{@oauthd_base}/#{provider} with k=#{@public_key} and redirect_uri=#{redirect_url}"
 
-    url = @oauthd_url + @oauthd_base + '/' + provider + '?k=' + @public_key
+    url = endpoint_url + '/' + provider + '?k=' + @public_key
 
     opts = {state: csrf_token}.to_json
     url += '&opts=' + URI.escape("#{opts}", Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
@@ -43,6 +44,10 @@ module Oauthio
     url += '&redirect_type=server&redirect_uri=' + URI.escape(redirect_url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 
     url
+  end
+
+  def self.endpoint_url
+    @oauthd_url + @oauthd_base
   end
 
   #####################
