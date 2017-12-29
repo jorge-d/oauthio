@@ -4,6 +4,8 @@ Welcome to your new gem! In this directory, you'll find the files you need to be
 
 TODO: Delete this and the text above, and describe your gem
 
+WORK IN PROGRESS
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -22,7 +24,41 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Example:
+
+
+```
+# routes.rb
+get 'oauth/:provider/signin', to: 'auth/oauth_callbacks#signin'
+get 'oauth/redirect', to: 'auth/oauth_callbacks#redirect'
+
+# controllers/auth/oauth_callbacks_controller.rb
+ def signin
+  # ..
+  # check params[:provider] is enabled
+  # ...
+
+  session[:oauthio_state_token] = form_authenticity_token
+  redirect_to Oauthio.auth_url('google', 'http://localhost:3000/oauth/redirect', session[:oauthio_state_token])
+end
+
+def redirect
+  oauthio_payload = JSON.parse(params['oauthio'])
+
+  if session[:oauthio_state_token].present? &&oauthio_payload['state'] == session[:oauthio_state_token]
+    if oauthio_payload['status'] == 'success'
+      oauth_client = Oauthio::Client.new 'google', oauthio_payload['data']['access_token']
+
+      render json: oauth_client.me
+    else
+      render json: { error: "Invalid oauth.io status: #{oauthio_payload['status']}" }
+    end
+  else
+    render json: { error: 'CSRF token does NOT match' }
+  end
+end
+
+```
 
 ## Development
 
