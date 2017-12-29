@@ -1,5 +1,9 @@
+# load standard ruby libraries
 require 'logger'
+require 'uri'
+require 'json'
 
+# load project files
 require "oauthio/version"
 
 module Oauthio
@@ -28,6 +32,23 @@ module Oauthio
     @secret_key = sk
   end
 
+  def self.auth_url provider, redirect_url, csrf_token
+    puts "[oauthio] Redirect to #{@oauthd_url}#{@oauthd_base}/#{provider} with k=#{@public_key} and redirect_uri=#{redirect_url}"
+
+    url = @oauthd_url + @oauthd_base + '/' + provider + '?k=' + @public_key
+
+    opts = {state: csrf_token}.to_json
+    url += '&opts=' + URI.escape("#{opts}", Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+
+    url += '&redirect_type=server&redirect_uri=' + URI.escape(redirect_url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+
+    url
+  end
+
+  #####################
+  #      LOGGING      #
+  #####################
+
   def self.log_level
     @log_level
   end
@@ -39,7 +60,6 @@ module Oauthio
     @log_level = val
   end
 
-
   def self.logger
     @logger
   end
@@ -47,5 +67,4 @@ module Oauthio
   def self.logger=(val)
     @logger = val
   end
-
 end

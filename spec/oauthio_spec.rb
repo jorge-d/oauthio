@@ -45,4 +45,17 @@ RSpec.describe Oauthio do
       expect(Oauthio.logger).to eq logger
     end
   end
+
+  describe '.auth_url' do
+    let(:csrf_token) { '352d80-56-abc-db-f51ab4' }
+
+    before do
+      Oauthio.set_credentials 'PUBLIC_KEY', 'SECRET_KEY'
+    end
+
+    it 'works' do
+      expected = "https://oauth.io/auth/google?k=PUBLIC_KEY&opts=%7B%22state%22%3A%22352d80-56-abc-db-f51ab4%22%7D&redirect_type=server&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth%2Fredirect"
+      expect(Oauthio.auth_url('google', 'http://localhost:3000/oauth/redirect', csrf_token)).to eq expected
+    end
+  end
 end
