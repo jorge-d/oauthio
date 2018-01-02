@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     oauthio (0.1.0)
-      httparty (~> 0)
+      httparty (> 0.10)
 
 GEM
   remote: https://rubygems.org/

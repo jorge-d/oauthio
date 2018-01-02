@@ -2,10 +2,12 @@
 require 'logger'
 require 'uri'
 require 'json'
+require "stringio"
 
 # load project files
 require "oauthio/version"
 require "oauthio/client"
+require "oauthio/util"
 
 module Oauthio
   @public_key = nil
@@ -34,7 +36,7 @@ module Oauthio
   end
 
   def self.auth_url provider, redirect_url, csrf_token
-    puts "[oauthio] Redirect to #{@oauthd_url}#{@oauthd_base}/#{provider} with k=#{@public_key} and redirect_uri=#{redirect_url}"
+    Util.log_debug "[oauthio] Redirect to #{@oauthd_url}#{@oauthd_base}/#{provider} with k=#{@public_key} and redirect_uri=#{redirect_url}"
 
     url = endpoint_url + '/' + provider + '?k=' + @public_key
 
@@ -60,7 +62,7 @@ module Oauthio
 
   def self.log_level=(val)
     if !val.nil? && ![LEVEL_DEBUG, LEVEL_ERROR, LEVEL_INFO].include?(val)
-      raise ArgumentError, "log_level should only be set to `nil`, `debug` or `info`"
+      raise ArgumentError, "log_level should only be set to `Logger::DEBUG`, `Logger::ERROR` or `Logger::INFO`"
     end
     @log_level = val
   end
